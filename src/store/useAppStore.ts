@@ -2,11 +2,83 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Note, Theme } from '../types';
 
+const WELCOME_CONTENT = `# Welcome to MarkFlow
+
+> A fast, minimal markdown editor that lives in your browser — and respects your files.
+
+---
+
+## Getting Started
+
+You're looking at a **local note** right now — stored in your browser. No account, no cloud, no tracking.
+
+When you're ready to work with real files:
+
+1. Click **Open Folder** in the sidebar
+2. Pick any folder on your machine
+3. MarkFlow will show all your \`.md\` files in a collapsible tree
+4. Click any file to open it — edits save back to disk automatically
+
+---
+
+## Features
+
+- **Open Folder** — browse your local \`.md\` files in a folder tree, following your directory structure
+- **Auto-save to disk** — edits are written back to the original file 1 second after you stop typing
+- **Session restore** — reopen the browser and your last folder is restored (with a quick permission prompt)
+- **Local notes** — create quick scratch notes stored in the browser, no folder needed
+- **Live preview** — toggle between raw markdown and rendered output at any time
+- **GitHub Flavored Markdown** — tables, strikethrough, task lists, fenced code blocks, all supported
+- **Dark & light mode** — toggle in the top right, preference saved across sessions
+- **Search** — filter your local notes by title or content instantly
+- **Works offline** — no internet required after the page loads
+
+---
+
+## Keyboard Tips
+
+| Action | How |
+|---|---|
+| Switch to Preview | Click **Preview** in the header |
+| Switch to Edit | Click **Edit** in the header |
+| Save to disk | Automatic — just type and pause |
+| New note | **New Document** button in the sidebar |
+| Close folder | **Close Folder** button in the sidebar |
+
+---
+
+## Open Folder — Browser Support
+
+The folder feature uses the [File System Access API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_API).
+It works in **Chrome** and **Edge**. On Firefox or Safari, the button is hidden and local notes work as normal.
+
+---
+
+## Built With Love
+
+MarkFlow is open source and free to use forever.
+
+If it saves you time or becomes part of your daily writing flow, consider saying thanks:
+
+- ⭐ **Star the repo** on [GitHub](https://github.com/IamFishR/mymarkdown) — it helps more people find it
+- ☕ **Buy me a coffee** — every bit keeps the project alive and growing
+
+---
+
+## Contact
+
+Made by **Rakesh Jadhav**
+
+Got feedback, a bug report, or just want to say hi?
+Reach out at [thisisganesh353@gmail.com](mailto:thisisganesh353@gmail.com)
+
+Thank you for using MarkFlow. Happy writing. 🖊️
+`;
+
 const INITIAL_NOTE: Note = {
   id: 'welcome',
   title: 'Welcome to MarkFlow',
-  content:
-    '# Welcome to MarkFlow\n\nStart editing this file or create a new one. MarkFlow is blazing fast and lightweight.\n\n### Features:\n- **Markdown Support** (GFM)\n- **Live Preview**\n- **Auto-save** to LocalStorage\n- **Dark Mode** toggle\n- **Fast Search**',
+  content: WELCOME_CONTENT,
   updatedAt: Date.now(),
   createdAt: Date.now(),
 };
@@ -39,7 +111,7 @@ export const useAppStore = create<AppState>()(
     (set, get) => ({
       theme: 'dark',
       isSidebarOpen: true,
-      isPreviewMode: false,
+      isPreviewMode: true,
       searchQuery: '',
       notes: [INITIAL_NOTE],
       activeNoteId: INITIAL_NOTE.id,
