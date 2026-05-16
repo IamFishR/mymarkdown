@@ -13,6 +13,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { cn } from './lib/utils';
 import { Sidebar } from './components/Sidebar';
+import { CodeBlock } from './components/CodeBlock';
 import { useAppStore } from './store/useAppStore';
 import { useFSStore } from './store/useFSStore';
 
@@ -95,10 +96,10 @@ export default function App() {
               </button>
             )}
             <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 font-mono italic">
-              <FileText size={16} />
+              <FileText size={16} className="hidden sm:block shrink-0" />
               <span className="hidden sm:inline">{breadcrumbRoot}</span>
-              <ChevronRight size={14} />
-              <span className="text-gray-900 dark:text-white font-medium not-italic">
+              <ChevronRight size={14} className="hidden sm:block shrink-0" />
+              <span className="text-gray-900 dark:text-white font-medium not-italic truncate max-w-[160px] sm:max-w-none text-sm sm:text-sm">
                 {editorTitle || 'Untitled'}
               </span>
             </div>
@@ -174,7 +175,7 @@ export default function App() {
                   className="flex-1 h-full overflow-y-auto"
                 >
                   <div className="max-w-4xl mx-auto p-12 prose dark:prose-invert prose-orange prose-pre:bg-gray-900 prose-pre:p-0">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ pre: ({ children, ...props }) => <CodeBlock {...props}>{children}</CodeBlock> }}>
                       {editorContent || '*No content to preview*'}
                     </ReactMarkdown>
                   </div>

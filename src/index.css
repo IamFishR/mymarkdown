@@ -28,7 +28,7 @@
   }
   
   .prose h1 { @apply text-4xl font-bold mb-8 mt-4 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-800 pb-4; }
-  .prose h2 { @apply text-2xl font-bold mb-4 mt-8 text-gray-900 dark:text-white; }
+  .prose h2 { @apply text-2xl font-bold mb-4 mt-8 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-800 pb-3; }
   .prose h3 { @apply text-xl font-bold mb-3 mt-6 text-gray-900 dark:text-white; }
   .prose p { @apply mb-4 last:mb-0; }
   .prose ul { @apply list-disc pl-6 mb-4 space-y-2; }
@@ -38,7 +38,7 @@
     @apply bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded font-mono text-sm text-orange-600 dark:text-orange-400;
     font-variant-ligatures: common-ligatures;
   }
-  .prose pre { @apply bg-gray-100 dark:bg-gray-900 p-6 rounded-xl overflow-x-auto my-6 border border-gray-200 dark:border-gray-800; }
+  .prose pre { @apply bg-gray-100 dark:bg-gray-900 p-6 rounded-xl overflow-x-auto border border-gray-200 dark:border-gray-800; }
   .prose pre code { 
     @apply bg-transparent p-0 text-gray-800 dark:text-gray-200 text-sm leading-relaxed;
     font-variant-ligatures: common-ligatures;
