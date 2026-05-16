@@ -1,0 +1,71 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap');
+
+@theme {
+  --color-orange-50: #fff7ed;
+  --color-orange-100: #ffedd5;
+  --color-orange-400: #fb923c;
+  --color-orange-500: #f97316;
+  --color-orange-600: #ea580c;
+  --color-orange-700: #c2410c;
+
+  --font-mono: "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* Fix dark mode to work with 'dark' class on html element */
+@variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  body {
+    @apply antialiased selection:bg-orange-100 dark:selection:bg-orange-500/30;
+  }
+}
+
+@layer components {
+  /* Simple Lightweight Markdown Styling */
+  .prose {
+    @apply text-gray-700 dark:text-gray-300 leading-relaxed max-w-none;
+  }
+  
+  .prose h1 { @apply text-4xl font-bold mb-8 mt-4 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-800 pb-4; }
+  .prose h2 { @apply text-2xl font-bold mb-4 mt-8 text-gray-900 dark:text-white; }
+  .prose h3 { @apply text-xl font-bold mb-3 mt-6 text-gray-900 dark:text-white; }
+  .prose p { @apply mb-4 last:mb-0; }
+  .prose ul { @apply list-disc pl-6 mb-4 space-y-2; }
+  .prose ol { @apply list-decimal pl-6 mb-4 space-y-2; }
+  .prose blockquote { @apply border-l-4 border-orange-500 pl-4 py-1 italic text-gray-600 dark:text-gray-400 my-6; }
+  .prose code { 
+    @apply bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded font-mono text-sm text-orange-600 dark:text-orange-400;
+    font-variant-ligatures: common-ligatures;
+  }
+  .prose pre { @apply bg-gray-100 dark:bg-gray-900 p-6 rounded-xl overflow-x-auto my-6 border border-gray-200 dark:border-gray-800; }
+  .prose pre code { 
+    @apply bg-transparent p-0 text-gray-800 dark:text-gray-200 text-sm leading-relaxed;
+    font-variant-ligatures: common-ligatures;
+  }
+  .prose a { @apply text-orange-600 dark:text-orange-400 underline decoration-orange-500/30 underline-offset-4 hover:decoration-orange-500 transition-all; }
+  .prose hr { @apply my-10 border-gray-200 dark:border-gray-800; }
+  .prose table { @apply w-full text-left border-collapse my-6; }
+  .prose th { @apply border-b-2 border-gray-200 dark:border-gray-800 p-3 font-semibold; }
+  .prose td { @apply border-b border-gray-100 dark:border-gray-900 p-3; }
+  .prose strong { @apply font-bold text-gray-900 dark:text-white; }
+}
+
+/* Editor Specific Styling */
+.editor-textarea {
+  font-variant-ligatures: common-ligatures;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-200 dark:bg-gray-800 rounded-full hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors;
+}

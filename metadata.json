@@ -1,0 +1,6 @@
+{
+  "name": "MarkFlow",
+  "description": "A lightweight, blazing-fast markdown viewer and editor with dark mode support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
