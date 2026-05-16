@@ -110,7 +110,7 @@ export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
       theme: 'dark',
-      isSidebarOpen: true,
+      isSidebarOpen: window.innerWidth >= 768,
       isPreviewMode: true,
       searchQuery: '',
       notes: [INITIAL_NOTE],
