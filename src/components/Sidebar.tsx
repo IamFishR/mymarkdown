@@ -1,9 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { motion } from 'motion/react';
 import { Plus, Search, Trash2, FileText, X, FolderOpen, FolderX, Clock, RefreshCw } from 'lucide-react';
 import { useAppStore } from '../store/useAppStore';
 import { useFSStore } from '../store/useFSStore';
-import { FileTree } from './FileTree';
+import { FileTree, NewFileInput } from './FileTree';
 import { cn } from '../lib/utils';
 
 const isFSASupported = 'showDirectoryPicker' in window;
@@ -25,6 +25,9 @@ export function Sidebar() {
   const openFolder = useFSStore((s) => s.openFolder);
   const closeFolder = useFSStore((s) => s.closeFolder);
   const refreshTree = useFSStore((s) => s.refreshTree);
+  const createFileInDirectory = useFSStore((s) => s.createFileInDirectory);
+
+  const [isCreatingAtRoot, setIsCreatingAtRoot] = useState(false);
 
   const isInFolderMode = folderHandle !== null;
 
@@ -65,17 +68,26 @@ export function Sidebar() {
 
       {/* Folder mode banner */}
       {isInFolderMode && (
-        <div className="px-4 pb-2 flex items-center justify-between">
+        <div className="px-4 pb-2 flex items-center justify-between group/root">
           <span className="text-[10px] uppercase tracking-widest text-orange-500 font-mono font-semibold truncate">
             {folderName}
           </span>
-          <button
-            onClick={refreshTree}
-            title="Refresh"
-            className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-          >
-            <RefreshCw size={12} />
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setIsCreatingAtRoot(true)}
+              title="New file in root"
+              className="opacity-0 group-hover/root:opacity-100 p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-all text-gray-400 hover:text-orange-500"
+            >
+              <Plus size={12} />
+            </button>
+            <button
+              onClick={refreshTree}
+              title="Refresh"
+              className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            >
+              <RefreshCw size={12} />
+            </button>
+          </div>
         </div>
       )}
 
@@ -98,14 +110,25 @@ export function Sidebar() {
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto px-4 py-2 space-y-1">
         {isInFolderMode ? (
-          tree.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center text-gray-400 dark:text-gray-600 text-sm gap-2">
-              <FileText size={32} className="opacity-30" />
-              <span>No markdown files found</span>
-            </div>
-          ) : (
-            <FileTree nodes={tree} />
-          )
+          <>
+            {isCreatingAtRoot && (
+              <NewFileInput
+                onSubmit={async (name) => {
+                  setIsCreatingAtRoot(false);
+                  await createFileInDirectory(null, name);
+                }}
+                onCancel={() => setIsCreatingAtRoot(false)}
+              />
+            )}
+            {tree.length === 0 && !isCreatingAtRoot ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center text-gray-400 dark:text-gray-600 text-sm gap-2">
+                <FileText size={32} className="opacity-30" />
+                <span>No markdown files found</span>
+              </div>
+            ) : (
+              <FileTree nodes={tree} />
+            )}
+          </>
         ) : (
           filteredNotes.map((note) => (
             <div

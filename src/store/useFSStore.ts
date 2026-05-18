@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { get as idbGet, set as idbSet, del as idbDel } from 'idb-keyval';
 import { FolderNode, SaveStatus } from '../types';
-import { buildFolderTree, readFile, writeFile, requestPermission, toggleNodeOpen } from '../lib/fs';
+import { buildFolderTree, readFile, writeFile, requestPermission, toggleNodeOpen, getDirectoryHandleAtPath, preserveOpenState, setDirectoryOpen } from '../lib/fs';
 
 const IDB_KEY = 'markflow_folder_handle';
 
@@ -22,6 +22,7 @@ interface FSState {
   toggleDirectory: (path: string) => void;
   restoreFromIndexedDB: () => Promise<void>;
   refreshTree: () => Promise<void>;
+  createFileInDirectory: (dirPath: string | null, fileName: string) => Promise<void>;
 }
 
 let saveIdleTimer: ReturnType<typeof setTimeout> | undefined;
@@ -131,5 +132,37 @@ export const useFSStore = create<FSState>()((set, get) => ({
     if (!folderHandle) return;
     const tree = await buildFolderTree(folderHandle);
     set({ tree });
+  },
+
+  createFileInDirectory: async (dirPath, fileName) => {
+    const { folderHandle, tree } = get();
+    if (!folderHandle) return;
+
+    const name = fileName.trim();
+    if (!name) return;
+    const finalName = name.endsWith('.md') ? name : `${name}.md`;
+
+    try {
+      const dirHandle = await getDirectoryHandleAtPath(folderHandle, dirPath);
+      const fileHandle = await dirHandle.getFileHandle(finalName, { create: true });
+      await writeFile(fileHandle, '');
+
+      const newTree = await buildFolderTree(folderHandle);
+      let merged = preserveOpenState(newTree, tree);
+      if (dirPath) {
+        merged = setDirectoryOpen(merged, dirPath, true);
+      }
+
+      const filePath = dirPath ? `${dirPath}/${finalName}` : finalName;
+      set({
+        tree: merged,
+        activeFilePath: filePath,
+        activeFileHandle: fileHandle,
+        activeFileContent: '',
+        saveStatus: 'idle',
+      });
+    } catch (e) {
+      console.error('Failed to create file:', e);
+    }
   },
 }));

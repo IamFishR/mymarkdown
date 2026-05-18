@@ -1,5 +1,40 @@
 import { FolderNode } from '../types';
 
+export async function getDirectoryHandleAtPath(
+  root: FileSystemDirectoryHandle,
+  dirPath: string | null
+): Promise<FileSystemDirectoryHandle> {
+  if (!dirPath) return root;
+  const parts = dirPath.split('/');
+  let current = root;
+  for (const part of parts) {
+    current = await current.getDirectoryHandle(part);
+  }
+  return current;
+}
+
+export function preserveOpenState(newTree: FolderNode[], oldTree: FolderNode[]): FolderNode[] {
+  return newTree.map((node) => {
+    if (node.kind !== 'directory') return node;
+    const oldNode = oldTree.find((n) => n.path === node.path && n.kind === 'directory') as
+      | Extract<FolderNode, { kind: 'directory' }>
+      | undefined;
+    return {
+      ...node,
+      isOpen: oldNode ? oldNode.isOpen : false,
+      children: preserveOpenState(node.children, oldNode ? oldNode.children : []),
+    };
+  });
+}
+
+export function setDirectoryOpen(tree: FolderNode[], targetPath: string, open: boolean): FolderNode[] {
+  return tree.map((node) => {
+    if (node.kind !== 'directory') return node;
+    if (node.path === targetPath) return { ...node, isOpen: open };
+    return { ...node, children: setDirectoryOpen(node.children, targetPath, open) };
+  });
+}
+
 export async function buildFolderTree(
   dirHandle: FileSystemDirectoryHandle,
   parentPath?: string
