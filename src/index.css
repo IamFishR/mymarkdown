@@ -56,6 +56,25 @@
   font-variant-ligatures: common-ligatures;
 }
 
+/* TipTap placeholder */
+.ProseMirror p.is-editor-empty:first-child::before {
+  color: #9ca3af;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* TipTap: remove default focus outline (handled via editorProps) */
+.ProseMirror:focus {
+  outline: none;
+}
+
+/* TipTap list items inherit prose spacing */
+.ProseMirror li > p {
+  margin: 0;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

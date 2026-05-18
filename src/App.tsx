@@ -9,11 +9,9 @@ import {
   Clock,
   Type,
 } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { cn } from './lib/utils';
 import { Sidebar } from './components/Sidebar';
-import { CodeBlock } from './components/CodeBlock';
+import { RichEditor } from './components/RichEditor';
 import { useAppStore } from './store/useAppStore';
 import { useFSStore } from './store/useFSStore';
 
@@ -125,7 +123,7 @@ export default function App() {
                     isPreviewMode ? 'bg-white dark:bg-gray-800 shadow-sm text-orange-600' : 'text-gray-500'
                   )}
                 >
-                  Preview
+                  Visual
                 </button>
               </div>
             )}
@@ -172,13 +170,13 @@ export default function App() {
                   initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 10 }}
-                  className="flex-1 h-full overflow-y-auto"
+                  className="flex-1 h-full overflow-hidden flex flex-col"
                 >
-                  <div className="max-w-4xl mx-auto p-12 prose dark:prose-invert prose-orange prose-pre:bg-gray-900 prose-pre:p-0">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ pre: ({ children, ...props }) => <CodeBlock {...props}>{children}</CodeBlock> }}>
-                      {editorContent || '*No content to preview*'}
-                    </ReactMarkdown>
-                  </div>
+                  <RichEditor
+                    key={isInFolderMode ? (activeFilePath ?? '') : (activeNote?.id ?? '')}
+                    initialContent={editorContent}
+                    onChange={handleEditorChange}
+                  />
                 </motion.div>
               )}
             </AnimatePresence>
