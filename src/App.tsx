@@ -54,7 +54,7 @@ export default function App() {
   const editorTitle = isInFolderMode
     ? (activeFilePath?.split('/').pop()?.replace(/\.md$/, '') ?? '')
     : (activeNote?.title ?? 'Untitled');
-  const breadcrumbRoot = isInFolderMode ? folderName : 'Notes';
+  const breadcrumbRoot = isInFolderMode ? folderName : 'notes';
 
   const wordCount = editorContent.trim().split(/\s+/).filter(Boolean).length;
   const readingTime = Math.ceil(wordCount / 200);
@@ -93,12 +93,12 @@ export default function App() {
                 <Menu size={20} />
               </button>
             )}
-            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 font-mono italic">
+            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 font-mono italic lowercase">
               <FileText size={16} className="hidden sm:block shrink-0" />
               <span className="hidden sm:inline">{breadcrumbRoot}</span>
               <ChevronRight size={14} className="hidden sm:block shrink-0" />
               <span className="text-gray-900 dark:text-white font-medium not-italic truncate max-w-[160px] sm:max-w-none text-sm sm:text-sm">
-                {editorTitle || 'Untitled'}
+                {editorTitle || 'untitled'}
               </span>
             </div>
           </div>

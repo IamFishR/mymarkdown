@@ -77,7 +77,7 @@ Thank you for using MarkFlow. Happy writing. 🖊️
 
 const INITIAL_NOTE: Note = {
   id: 'welcome',
-  title: 'Welcome to MarkFlow',
+  title: 'MarkFlow',
   content: WELCOME_CONTENT,
   updatedAt: Date.now(),
   createdAt: Date.now(),
