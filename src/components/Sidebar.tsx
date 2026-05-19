@@ -144,41 +144,51 @@ export function Sidebar() {
             )}
           </>
         ) : (
-          filteredNotes.map((note) => (
-            <div
-              key={note.id}
-              onClick={() => setActiveNoteId(note.id)}
-              className={cn(
-                'group flex items-center justify-between p-1.5 sm:p-2 rounded-2xl cursor-pointer transition-all duration-300 relative',
-                activeNoteId === note.id
-                  ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400'
-                  : 'hover:bg-gray-200/50 dark:hover:bg-gray-800/50 text-gray-600 dark:text-gray-400'
-              )}
-            >
-              {activeNoteId === note.id && (
-                <motion.div
-                  layoutId="active-note"
-                  className="absolute left-0 w-1 h-6 bg-orange-500 rounded-r-full"
-                />
-              )}
-              <div className="flex flex-col gap-0.5 overflow-hidden">
-                <span className="font-medium text-sm truncate">{note.title || 'Untitled Note'}</span>
-                <span className="text-[10px] opacity-60 flex items-center gap-1 uppercase tracking-tighter">
-                  <Clock size={10} />
-                  {new Date(note.updatedAt).toLocaleDateString()}
-                </span>
-              </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  deleteNote(note.id);
-                }}
-                className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-red-500 transition-all"
+          filteredNotes.map((note) => {
+            const isActive = activeNoteId === note.id;
+            return (
+              <div
+                key={note.id}
+                onClick={() => setActiveNoteId(note.id)}
+                className={cn(
+                  'group flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all duration-300 relative mb-1',
+                  isActive
+                    ? 'bg-white dark:bg-orange-500/10 shadow-md border border-orange-200 dark:border-orange-500/20'
+                    : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400'
+                )}
               >
-                <Trash2 size={14} />
-              </button>
-            </div>
-          ))
+                <div className={cn(
+                  "w-9 h-9 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300",
+                  isActive ? "bg-orange-500 text-white shadow-lg rotate-3" : "bg-gray-200 dark:bg-gray-800 text-gray-400 group-hover:rotate-6"
+                )}>
+                  <FileText size={16} />
+                </div>
+                
+                <div className="flex flex-col gap-0.5 overflow-hidden flex-1">
+                  <span className={cn(
+                    "font-bold text-sm truncate",
+                    isActive ? "text-orange-700 dark:text-orange-400" : "text-gray-700 dark:text-gray-300"
+                  )}>
+                    {note.title || 'Untitled Note'}
+                  </span>
+                  <span className="text-[10px] opacity-60 flex items-center gap-1 uppercase tracking-wider font-semibold">
+                    <Clock size={10} />
+                    {new Date(note.updatedAt).toLocaleDateString()}
+                  </span>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteNote(note.id);
+                  }}
+                  className="opacity-0 group-hover:opacity-100 p-2 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all shrink-0"
+                  title="Delete Note"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            );
+          })
         )}
       </div>
 

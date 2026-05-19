@@ -76,7 +76,7 @@ function DirectoryNode({ node, depth }: { node: Extract<FolderNode, { kind: 'dir
       >
         <button
           onClick={() => toggleDirectory(node.path)}
-          className="flex-1 flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors text-left text-gray-600 dark:text-gray-400"
+          className="flex-1 flex items-center gap-1.5 px-3 py-2 text-sm rounded-2xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left text-gray-600 dark:text-gray-400 font-bold"
         >
           {node.isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
           <span className="truncate font-medium">{node.name}</span>
@@ -137,14 +137,21 @@ export function FileTree({ nodes, depth = 0 }: FileTreeProps) {
             key={node.path}
             onClick={() => openFile(node)}
             className={cn(
-              'w-full flex items-center gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 text-sm rounded-lg transition-colors text-left',
+              'w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-2xl transition-all duration-300 text-left mb-1',
               isActive
-                ? 'bg-orange-50 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400'
-                : 'hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-300'
+                ? 'bg-white dark:bg-orange-500/10 text-orange-700 dark:text-orange-400 shadow-md border border-orange-200 dark:border-orange-500/20'
+                : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
             )}
           >
-            <FileText size={14} className="shrink-0 opacity-70" />
-            <span className="truncate">{displayName}</span>
+            <div className={cn(
+              "w-8 h-8 rounded-2xl flex items-center justify-center shrink-0 transition-colors",
+              isActive ? "bg-orange-500 text-white shadow-lg" : "bg-gray-200 dark:bg-gray-800 text-gray-400"
+            )}>
+              <FileText size={14} />
+            </div>
+            <span className={cn("truncate font-medium", isActive ? "text-orange-700 dark:text-orange-400" : "text-gray-700 dark:text-gray-300")}>
+              {displayName}
+            </span>
           </button>
         );
       })}
