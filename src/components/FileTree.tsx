@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronRight, ChevronDown, FileText, Plus } from 'lucide-react';
 import { FolderNode } from '../types';
@@ -50,7 +50,7 @@ export function NewFileInput({ onSubmit, onCancel }: NewFileInputProps) {
   );
 }
 
-function DirectoryNode({ node, depth }: { node: Extract<FolderNode, { kind: 'directory' }>; depth: number }) {
+function DirectoryNode({ node, depth }: { node: Extract<FolderNode, { kind: 'directory' }>; depth: number; key?: string }) {
   const [isCreating, setIsCreating] = useState(false);
   const [isRowHovered, setIsRowHovered] = useState(false);
   const toggleDirectory = useFSStore((s) => s.toggleDirectory);
@@ -76,7 +76,7 @@ function DirectoryNode({ node, depth }: { node: Extract<FolderNode, { kind: 'dir
       >
         <button
           onClick={() => toggleDirectory(node.path)}
-          className="flex-1 flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors text-left text-gray-600 dark:text-gray-400"
+          className="flex-1 flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors text-left text-gray-600 dark:text-gray-400"
         >
           {node.isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
           <span className="truncate font-medium">{node.name}</span>
@@ -137,7 +137,7 @@ export function FileTree({ nodes, depth = 0 }: FileTreeProps) {
             key={node.path}
             onClick={() => openFile(node)}
             className={cn(
-              'w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors text-left',
+              'w-full flex items-center gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 text-sm rounded-lg transition-colors text-left',
               isActive
                 ? 'bg-orange-50 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400'
                 : 'hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-300'

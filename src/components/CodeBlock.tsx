@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Copy, Check } from 'lucide-react';
 import { cn } from '../lib/utils';
 
@@ -32,7 +32,7 @@ export function CodeBlock({ children, className, ...props }: CodeBlockProps) {
         onClick={handleCopy}
         title={copied ? 'Copied!' : 'Copy code'}
         className={cn(
-          'absolute top-3 right-3 p-1.5 rounded-md transition-all',
+          'absolute top-3 right-3 p-1.5 rounded-2xl transition-all',
           'opacity-0 group-hover:opacity-100',
           'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600',
           'text-gray-600 dark:text-gray-300'

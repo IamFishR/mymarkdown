@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Moon,
@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Clock,
   Type,
+  Search,
 } from 'lucide-react';
 import { cn } from './lib/utils';
 import { Sidebar } from './components/Sidebar';
@@ -42,6 +43,15 @@ export default function App() {
     restoreFromIndexedDB();
   }, []);
 
+  // Apply theme to document
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
+
   // Debounce timer ref for folder-mode saves
   const saveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -71,47 +81,94 @@ export default function App() {
     }
   };
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   return (
     <div
       className={cn(
-        'flex h-screen w-full transition-colors duration-300',
+        'flex h-screen w-full transition-colors duration-500 relative overflow-hidden',
         'bg-gray-50 text-gray-900 dark:bg-[#0a0a0a] dark:text-gray-100'
       )}
     >
+      {/* Background ambient glows */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-orange-500/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-orange-500/5 rounded-full blur-[120px] pointer-events-none" />
+
       <Sidebar />
+      
+      {/* Backdrop for floating sidebar */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSidebarOpen(false)}
+            className="fixed inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-[2px] z-40 md:hidden"
+          />
+        )}
+      </AnimatePresence>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col h-full overflow-hidden relative">
-        {/* Header toolbar */}
-        <header className="h-16 flex items-center justify-between px-6 border-b border-gray-200 dark:border-gray-800 bg-white/50 dark:bg-[#0a0a0a]/50 backdrop-blur-sm z-30 shrink-0">
+      <motion.main 
+        initial={false}
+        animate={{ 
+          paddingLeft: isSidebarOpen && !isMobile ? 312 : 0,
+        }}
+        transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+        className="flex-1 flex flex-col h-full overflow-hidden relative"
+      >
+        {/* Header toolbar - Floating Capsule */}
+        <motion.header 
+          initial={false}
+          animate={{ 
+            left: isSidebarOpen && !isMobile ? 312 : 16,
+            right: 16,
+          }}
+          transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+          className="fixed top-4 h-14 flex items-center justify-between px-6 bg-white/40 dark:bg-[#0a0a0a]/40 backdrop-blur-xl rounded-2xl shadow-xl z-30 shrink-0"
+        >
           <div className="flex items-center gap-4">
             {!isSidebarOpen && (
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl transition-colors text-orange-600"
               >
-                <Menu size={20} />
+                <Menu size={18} />
               </button>
             )}
             <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 font-mono italic lowercase">
-              <FileText size={16} className="hidden sm:block shrink-0" />
-              <span className="hidden sm:inline">{breadcrumbRoot}</span>
-              <ChevronRight size={14} className="hidden sm:block shrink-0" />
-              <span className="text-gray-900 dark:text-white font-medium not-italic truncate max-w-[160px] sm:max-w-none text-sm sm:text-sm">
-                {editorTitle || 'untitled'}
-              </span>
+              <FileText size={16} className="hidden md:block shrink-0" />
+              <span className="hidden md:inline">{breadcrumbRoot}</span>
+              {editorTitle && (
+                <>
+                  <span className="opacity-30">/</span>
+                  <span className="text-gray-800 dark:text-gray-200 font-bold truncate max-w-[150px]">
+                    {editorTitle}
+                  </span>
+                </>
+              )}
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Edit / Preview toggle — only when a file/note is active */}
+            {/* Edit / Preview toggle */}
             {(!isInFolderMode || activeFilePath) && (
-              <div className="flex bg-gray-100 dark:bg-gray-900 p-1 rounded-lg">
+              <div className="flex bg-gray-200/50 dark:bg-gray-900/50 p-1 rounded-2xl backdrop-blur-sm">
                 <button
                   onClick={() => setPreviewMode(false)}
                   className={cn(
-                    'px-3 py-1 text-xs font-medium rounded-md transition-all',
-                    !isPreviewMode ? 'bg-white dark:bg-gray-800 shadow-sm text-orange-600' : 'text-gray-500'
+                    'px-3 py-1 text-xs font-semibold rounded-2xl transition-all duration-300',
+                    !isPreviewMode 
+                      ? 'bg-white dark:bg-gray-800 shadow-md text-orange-600 glow-orange-sm' 
+                      : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
                   )}
                 >
                   Edit
@@ -119,27 +176,29 @@ export default function App() {
                 <button
                   onClick={() => setPreviewMode(true)}
                   className={cn(
-                    'px-3 py-1 text-xs font-medium rounded-md transition-all',
-                    isPreviewMode ? 'bg-white dark:bg-gray-800 shadow-sm text-orange-600' : 'text-gray-500'
+                    'px-3 py-1 text-xs font-semibold rounded-2xl transition-all duration-300',
+                    isPreviewMode 
+                      ? 'bg-white dark:bg-gray-800 shadow-md text-orange-600 glow-orange-sm' 
+                      : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
                   )}
                 >
                   Visual
                 </button>
               </div>
             )}
-
+            
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-600 dark:text-gray-400"
-              title="Toggle Theme"
+              className="p-2 bg-white/40 dark:bg-[#0a0a0a]/40 backdrop-blur-xl rounded-2xl hover:scale-110 active:scale-95 transition-all text-gray-500 hover:text-orange-500 border border-white/20 dark:border-white/10 shadow-lg"
+              title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             >
-              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             </button>
           </div>
-        </header>
+        </motion.header>
 
         {/* Editor & Preview Area */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 overflow-y-auto pt-20">
           {/* Empty state when in folder mode with no file open */}
           {isInFolderMode && !activeFilePath ? (
             <div className="flex-1 flex flex-col items-center justify-center text-gray-300 dark:text-gray-700 gap-3 select-none">
@@ -158,10 +217,11 @@ export default function App() {
                 >
                   <textarea
                     autoFocus
+                    spellCheck="false"
                     value={editorContent}
                     onChange={(e) => handleEditorChange(e.target.value)}
                     placeholder="# Start typing your markdown..."
-                    className="flex-1 w-full bg-transparent p-10 outline-none resize-none font-mono text-lg leading-relaxed dark:placeholder-gray-700 placeholder-gray-300 editor-textarea"
+                    className="flex-1 w-full max-w-4xl mx-auto bg-transparent px-4 py-4 sm:px-8 sm:py-8 md:px-10 md:py-10 outline-none resize-none font-mono text-base sm:text-lg leading-relaxed dark:placeholder-gray-700 placeholder-gray-300 editor-textarea"
                   />
                 </motion.div>
               ) : (
@@ -183,17 +243,25 @@ export default function App() {
           )}
         </div>
 
-        {/* Footer Stats */}
-        <footer className="h-10 px-6 border-t border-gray-200 dark:border-gray-800 flex items-center justify-between text-[11px] font-mono text-gray-400 bg-white dark:bg-[#0a0a0a] shrink-0">
+        {/* Footer Stats - Floating Capsule */}
+        <motion.footer 
+          initial={false}
+          animate={{ 
+            left: isSidebarOpen && !isMobile ? 312 : 16,
+            right: 16,
+          }}
+          transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+          className="fixed bottom-4 h-10 px-6 bg-white/40 dark:bg-[#0a0a0a]/40 backdrop-blur-xl rounded-2xl flex items-center justify-between text-[10px] uppercase tracking-[0.15em] font-bold text-gray-400 shadow-lg z-30 shrink-0 animate-in fade-in slide-in-from-bottom-2 duration-700 border border-white/20 dark:border-white/10"
+        >
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1 uppercase tracking-widest">
-              <Type size={12} /> {wordCount} Words
+            <span className="flex items-center gap-1.5 uppercase tracking-widest hover:text-orange-500 transition-colors cursor-default">
+              <Type size={12} className="text-orange-500" /> {wordCount} Words
             </span>
-            <span className="flex items-center gap-1 uppercase tracking-widest">
-              <Clock size={12} /> {readingTime}m Read
+            <span className="flex items-center gap-1.5 uppercase tracking-widest hover:text-orange-500 transition-colors cursor-default">
+              <Clock size={12} className="text-orange-500" /> {readingTime} Min
             </span>
           </div>
-          <div>
+          <div className="flex items-center gap-2">
             {isInFolderMode ? (
               <span
                 className={cn(
@@ -216,8 +284,8 @@ export default function App() {
               'UTF-8 | Markdown GFM'
             )}
           </div>
-        </footer>
-      </main>
+        </motion.footer>
+      </motion.main>
     </div>
   );
 }

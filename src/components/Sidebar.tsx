@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Plus, Search, Trash2, FileText, X, FolderOpen, FolderX, Clock, RefreshCw } from 'lucide-react';
 import { useAppStore } from '../store/useAppStore';
@@ -28,6 +28,14 @@ export function Sidebar() {
   const createFileInDirectory = useFSStore((s) => s.createFileInDirectory);
 
   const [isCreatingAtRoot, setIsCreatingAtRoot] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const isInFolderMode = folderHandle !== null;
 
@@ -44,25 +52,31 @@ export function Sidebar() {
   return (
     <motion.aside
       initial={false}
-      animate={{ width: isSidebarOpen ? 300 : 0, opacity: isSidebarOpen ? 1 : 0 }}
+      animate={isMobile 
+        ? { x: isSidebarOpen ? 0 : -320, width: 280 } 
+        : { x: isSidebarOpen ? 0 : -320, width: 280 }
+      }
+      transition={{ type: 'spring', damping: 28, stiffness: 220 }}
       className={cn(
-        'relative flex flex-col border-r border-gray-200 dark:border-gray-800 overflow-hidden bg-white dark:bg-[#0a0a0a] z-40',
-        !isSidebarOpen && 'border-none'
+        'fixed left-4 top-4 bottom-4 flex flex-col overflow-hidden z-50',
+        'glass rounded-2xl shadow-2xl border border-white/10 dark:border-white/5',
+        'bg-gradient-to-b from-white/80 to-gray-50/80 dark:from-[#0a0a0a]/80 dark:to-[#0d0d0d]/80',
+        !isSidebarOpen && 'pointer-events-none'
       )}
     >
       {/* Header */}
-      <div className="p-4 flex items-center justify-between shrink-0">
+      <div className="p-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center text-white font-bold">
+          <div className="w-7 h-7 rounded-xl bg-orange-500 flex items-center justify-center text-white font-bold text-xs shadow-lg glow-orange-sm">
             M
           </div>
-          <span className="font-bold tracking-tight text-lg">MarkFlow</span>
+          <span className="font-bold tracking-tight text-base text-gray-800 dark:text-gray-200">MarkFlow</span>
         </div>
         <button
           onClick={() => setSidebarOpen(false)}
-          className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          className="p-1.5 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
         >
-          <X size={18} />
+          <X size={16} />
         </button>
       </div>
 
@@ -93,7 +107,7 @@ export function Sidebar() {
 
       {/* Search (local mode only) */}
       {!isInFolderMode && (
-        <div className="px-4 py-2 shrink-0">
+        <div className="px-3 sm:px-4 py-2 shrink-0">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
             <input
@@ -108,7 +122,7 @@ export function Sidebar() {
       )}
 
       {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto px-4 py-2 space-y-1">
+      <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-2 space-y-1">
         {isInFolderMode ? (
           <>
             {isCreatingAtRoot && (
@@ -135,12 +149,18 @@ export function Sidebar() {
               key={note.id}
               onClick={() => setActiveNoteId(note.id)}
               className={cn(
-                'group flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-200',
+                'group flex items-center justify-between p-1.5 sm:p-2 rounded-2xl cursor-pointer transition-all duration-300 relative',
                 activeNoteId === note.id
-                  ? 'bg-orange-50 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400'
-                  : 'hover:bg-gray-100 dark:hover:bg-gray-900'
+                  ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400'
+                  : 'hover:bg-gray-200/50 dark:hover:bg-gray-800/50 text-gray-600 dark:text-gray-400'
               )}
             >
+              {activeNoteId === note.id && (
+                <motion.div
+                  layoutId="active-note"
+                  className="absolute left-0 w-1 h-6 bg-orange-500 rounded-r-full"
+                />
+              )}
               <div className="flex flex-col gap-0.5 overflow-hidden">
                 <span className="font-medium text-sm truncate">{note.title || 'Untitled Note'}</span>
                 <span className="text-[10px] opacity-60 flex items-center gap-1 uppercase tracking-tighter">
@@ -163,11 +183,11 @@ export function Sidebar() {
       </div>
 
       {/* Footer buttons */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-800 flex flex-col gap-2 shrink-0">
+      <div className="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-800 flex flex-col gap-2 shrink-0">
         {isInFolderMode ? (
           <button
             onClick={closeFolder}
-            className="w-full flex items-center justify-center gap-2 bg-gray-100 dark:bg-gray-900 hover:bg-red-50 dark:hover:bg-red-500/10 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 font-semibold py-2.5 rounded-xl transition-all"
+            className="w-full flex items-center justify-center gap-2 bg-gray-100 dark:bg-gray-900 hover:bg-red-50 dark:hover:bg-red-500/10 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 font-semibold py-2 rounded-xl transition-all"
           >
             <FolderX size={18} />
             Close Folder
@@ -177,7 +197,7 @@ export function Sidebar() {
             {isFSASupported && (
               <button
                 onClick={openFolder}
-                className="w-full flex items-center justify-center gap-2 bg-gray-100 dark:bg-gray-900 hover:bg-orange-50 dark:hover:bg-orange-500/10 text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400 font-semibold py-2.5 rounded-xl transition-all"
+                className="w-full flex items-center justify-center gap-2 bg-gray-100 dark:bg-gray-900 hover:bg-orange-50 dark:hover:bg-orange-500/10 text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400 font-semibold py-2 rounded-xl transition-all"
               >
                 <FolderOpen size={18} />
                 Open Folder
@@ -185,7 +205,7 @@ export function Sidebar() {
             )}
             <button
               onClick={createNote}
-              className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 rounded-xl transition-all shadow-sm hover:shadow-orange-500/20 active:scale-95"
+              className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 rounded-2xl transition-all duration-300 shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 glow-orange-sm active:scale-[0.98] text-sm"
             >
               <Plus size={18} />
               New Document
