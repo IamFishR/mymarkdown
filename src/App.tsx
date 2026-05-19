@@ -45,12 +45,17 @@ export default function App() {
     restoreFromIndexedDB();
   }, []);
 
-  // Apply theme to document
+  // Apply theme to document and update browser theme-color
   useEffect(() => {
+    const root = document.documentElement;
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    
     if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
+      root.classList.add('dark');
+      metaThemeColor?.setAttribute('content', '#050505');
     } else {
-      document.documentElement.classList.remove('dark');
+      root.classList.remove('dark');
+      metaThemeColor?.setAttribute('content', '#ffffff');
     }
   }, [theme]);
 
