@@ -16,10 +16,16 @@
 /* Fix dark mode to work with 'dark' class on html element */
 @variant dark (&:where(.dark, .dark *));
 
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
 @layer base {
   body {
-    @apply antialiased selection:bg-orange-100/50 dark:selection:bg-orange-500/20 font-sans overflow-hidden;
-    background: fixed;
+    @apply antialiased selection:bg-orange-100/50 dark:selection:bg-orange-500/20 font-sans h-full w-full;
   }
 }
 
@@ -103,8 +109,10 @@
 }
 
 /* TipTap: remove default focus outline (handled via editorProps) */
-.ProseMirror:focus {
+.ProseMirror {
   outline: none;
+  height: auto !important;
+  overflow: visible !important;
 }
 
 /* TipTap list items inherit prose spacing */
