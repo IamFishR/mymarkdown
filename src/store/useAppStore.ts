@@ -31,7 +31,16 @@ When you're ready to work with real files:
 - **GitHub Flavored Markdown** — tables, strikethrough, task lists, fenced code blocks, all supported
 - **Dark & light mode** — toggle in the top right, preference saved across sessions
 - **Search** — filter your local notes by title or content instantly
+- **Context Menu** — select any text to see a floating toolbar with highlighting and formatting options
 - **Works offline** — no internet required after the page loads
+
+---
+
+## Highlighting & Formatting
+
+Try it now: **Select any word or sentence in this paragraph.** A floating "Bubble Menu" will appear. You can use it to:
+- <mark>Highlight important text</mark> for quick reference
+- Quickly apply **bold**, *italic*, or \`code\` styles without reaching for the top toolbar
 
 ---
 
@@ -39,8 +48,9 @@ When you're ready to work with real files:
 
 | Action | How |
 |---|---|
-| Switch to Preview | Click **Preview** in the header |
-| Switch to Edit | Click **Edit** in the header |
+| Switch to Preview | Click the **Eye icon** in the header |
+| Switch to Edit | Click the **Pen icon** in the header |
+| Open Context Menu | **Select text** with your mouse |
 | Save to disk | Automatic — just type and pause |
 | New note | **New Document** button in the sidebar |
 | Close folder | **Close Folder** button in the sidebar |
@@ -162,7 +172,7 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'markflow_app',
-      version: 1,
+      version: 2,
       partialize: (s) => ({
         theme: s.theme,
         isSidebarOpen: s.isSidebarOpen,
