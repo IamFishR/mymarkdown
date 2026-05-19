@@ -75,7 +75,7 @@ export function RichEditor({ initialContent, onChange }: RichEditorProps) {
   return (
     <div className="flex-1 overflow-y-auto bg-transparent relative scroll-smooth">
       {/* Floating Toolbar - Sticky within the scroll area */}
-      <div className="sticky top-0 z-20 w-full pt-24 pb-4 px-4 sm:px-8 md:px-10 pointer-events-none shrink-0">
+      <div className="sticky top-0 z-20 w-full pt-20 md:pt-24 pb-1 md:pb-4 px-4 sm:px-8 md:px-10 pointer-events-none shrink-0">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white/20 dark:bg-[#0a0a0a]/20 backdrop-blur-xl rounded-2xl shadow-xl border border-white/10 dark:border-white/5 flex items-center gap-0.5 px-3 py-1.5 flex-wrap pointer-events-auto">
             <ToolbarBtn title="Heading 1" active={editor.isActive('heading', { level: 1 })} onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}>
@@ -162,7 +162,7 @@ export function RichEditor({ initialContent, onChange }: RichEditorProps) {
       {/* Editor content */}
       <div className="flex-1 overflow-y-auto bg-transparent">
         {/* Top Spacer */}
-        <div className="h-24 w-full shrink-0" />
+        <div className="h-4 w-full shrink-0" />
         <div className="max-w-4xl mx-auto px-4 py-2 sm:px-8 md:px-10 sm:py-4">
           <EditorContent editor={editor} />
         </div>
