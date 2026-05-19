@@ -30,7 +30,7 @@ const ToolbarBtn = ({
     onClick={onClick}
     title={title}
     className={cn(
-      'p-2 rounded-xl transition-all duration-300',
+      'p-2 rounded-xl transition-all duration-300 shrink-0',
       active 
         ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.5)] scale-105 backdrop-blur-sm' 
         : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white'
@@ -40,7 +40,7 @@ const ToolbarBtn = ({
   </button>
 );
 
-const Sep = () => <div className="w-px h-4 bg-gray-200 dark:bg-gray-800 mx-1" />;
+const Sep = () => <div className="w-px h-4 bg-gray-200 dark:bg-gray-800 mx-1 shrink-0" />;
 
 export function RichEditor({ initialContent, onChange }: RichEditorProps) {
   const editor = useEditor({
@@ -74,43 +74,45 @@ export function RichEditor({ initialContent, onChange }: RichEditorProps) {
       {/* Sticky Toolbar - Sticks below the main app header */}
       <div className="sticky top-0 z-20 w-full pt-1 pb-4 pointer-events-none">
         <div className="max-w-4xl mx-auto px-4 sm:px-0">
-          <div className="bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200 dark:border-white/10 flex items-center gap-0.5 px-3 py-1.5 flex-wrap pointer-events-auto">
-            <ToolbarBtn title="Heading 1" active={editor.isActive('heading', { level: 1 })} onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}>
-              <Heading1 size={16} />
-            </ToolbarBtn>
-            <ToolbarBtn title="Heading 2" active={editor.isActive('heading', { level: 2 })} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
-              <Heading2 size={16} />
-            </ToolbarBtn>
-            <ToolbarBtn title="Heading 3" active={editor.isActive('heading', { level: 3 })} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
-              <Heading3 size={16} />
-            </ToolbarBtn>
+          <div className="bg-white/40 dark:bg-[#0a0a0a]/40 backdrop-blur-3xl rounded-2xl shadow-xl border border-white/20 dark:border-white/10 flex items-center gap-1 px-3 py-2 pointer-events-auto overflow-x-auto no-scrollbar whitespace-nowrap">
+            <div className="flex items-center gap-0.5">
+              <ToolbarBtn title="H1" active={editor.isActive('heading', { level: 1 })} onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}>
+                <Heading1 size={16} />
+              </ToolbarBtn>
+              <ToolbarBtn title="H2" active={editor.isActive('heading', { level: 2 })} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
+                <Heading2 size={16} />
+              </ToolbarBtn>
+              <ToolbarBtn title="H3" active={editor.isActive('heading', { level: 3 })} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
+                <Heading3 size={16} />
+              </ToolbarBtn>
 
-            <Sep />
+              <Sep />
 
-            <ToolbarBtn title="Bold (⌘B)" active={editor.isActive('bold')} onClick={() => editor.chain().focus().toggleBold().run()}>
-              <Bold size={16} />
-            </ToolbarBtn>
-            <ToolbarBtn title="Italic (⌘I)" active={editor.isActive('italic')} onClick={() => editor.chain().focus().toggleItalic().run()}>
-              <Italic size={16} />
-            </ToolbarBtn>
-            <ToolbarBtn title="Strikethrough" active={editor.isActive('strike')} onClick={() => editor.chain().focus().toggleStrike().run()}>
-              <Strikethrough size={16} />
-            </ToolbarBtn>
-            <ToolbarBtn title="Inline code" active={editor.isActive('code')} onClick={() => editor.chain().focus().toggleCode().run()}>
-              <Code size={16} />
-            </ToolbarBtn>
+              <ToolbarBtn title="Bold (⌘B)" active={editor.isActive('bold')} onClick={() => editor.chain().focus().toggleBold().run()}>
+                <Bold size={16} />
+              </ToolbarBtn>
+              <ToolbarBtn title="Italic (⌘I)" active={editor.isActive('italic')} onClick={() => editor.chain().focus().toggleItalic().run()}>
+                <Italic size={16} />
+              </ToolbarBtn>
+              <ToolbarBtn title="Strikethrough" active={editor.isActive('strike')} onClick={() => editor.chain().focus().toggleStrike().run()}>
+                <Strikethrough size={16} />
+              </ToolbarBtn>
+              <ToolbarBtn title="Inline code" active={editor.isActive('code')} onClick={() => editor.chain().focus().toggleCode().run()}>
+                <Code size={16} />
+              </ToolbarBtn>
 
-            <Sep />
+              <Sep />
 
-            <ToolbarBtn title="Bullet list" active={editor.isActive('bulletList')} onClick={() => editor.chain().focus().toggleBulletList().run()}>
-              <List size={16} />
-            </ToolbarBtn>
-            <ToolbarBtn title="Numbered list" active={editor.isActive('orderedList')} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
-              <ListOrdered size={16} />
-            </ToolbarBtn>
-            <ToolbarBtn title="Blockquote" active={editor.isActive('blockquote')} onClick={() => editor.chain().focus().toggleBlockquote().run()}>
-              <Quote size={16} />
-            </ToolbarBtn>
+              <ToolbarBtn title="Bullet list" active={editor.isActive('bulletList')} onClick={() => editor.chain().focus().toggleBulletList().run()}>
+                <List size={16} />
+              </ToolbarBtn>
+              <ToolbarBtn title="Numbered list" active={editor.isActive('orderedList')} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
+                <ListOrdered size={16} />
+              </ToolbarBtn>
+              <ToolbarBtn title="Blockquote" active={editor.isActive('blockquote')} onClick={() => editor.chain().focus().toggleBlockquote().run()}>
+                <Quote size={16} />
+              </ToolbarBtn>
+            </div>
           </div>
         </div>
       </div>
