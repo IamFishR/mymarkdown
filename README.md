@@ -40,7 +40,7 @@ The `dist/` folder is fully static — deploy it to any static host (Nginx, Cadd
 
 ## Environment
 
-Copy `.env.example` to `.env.local`. The `GEMINI_API_KEY` variable is available for adding Gemini AI features.
+Copy `.env.example` to `.env.local` if you need to set environment variables.
 
 ```bash
 cp .env.example .env.local
