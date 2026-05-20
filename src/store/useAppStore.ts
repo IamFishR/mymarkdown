@@ -12,27 +12,56 @@ const WELCOME_CONTENT = `# Welcome to MarkFlow
 
 You're looking at a **local note** right now — stored in your browser. No account, no cloud, no tracking.
 
-When you're ready to work with real files:
+**Three ways to work with markdown in MarkFlow:**
 
-1. Click **Open Folder** in the sidebar
-2. Pick any folder on your machine
-3. MarkFlow will show all your \`.md\` files in a collapsible tree
-4. Click any file to open it — edits save back to disk automatically
+1. **Local notes** — write directly here, stored in your browser, no setup needed
+2. **Open Folder** — pick a folder on your machine and browse all your \`.md\` files in a tree
+3. **From URL** — paste a GitHub repo link or any direct \`.md\` URL and read it instantly
 
 ---
 
 ## Features
 
-- **Open Folder** — browse your local \`.md\` files in a folder tree, following your directory structure
-- **Auto-save to disk** — edits are written back to the original file 1 second after you stop typing
-- **Session restore** — reopen the browser and your last folder is restored (with a quick permission prompt)
+### Writing & Editing
 - **Local notes** — create quick scratch notes stored in the browser, no folder needed
-- **Live preview** — toggle between raw markdown and rendered output at any time
+- **Open Folder** — browse your local \`.md\` files in a collapsible folder tree
+- **Auto-save to disk** — edits write back to the original file automatically after you stop typing
+- **Session restore** — reopen the browser and your last folder is restored automatically
+- **Live preview** — toggle between raw markdown and rendered visual output at any time
 - **GitHub Flavored Markdown** — tables, strikethrough, task lists, fenced code blocks, all supported
+
+### URL & GitHub Reading
+- **From URL** — paste any GitHub repo URL (e.g. \`github.com/owner/repo\`) to browse all its \`.md\` files in a folder tree
+- **Direct file URL** — paste a link to any raw \`.md\` file to open it immediately
+- **Read-only mode** — URL-sourced content is protected from accidental edits; toolbar and editing are disabled
+- **Supports \`.git\` URLs** — clone-style links like \`github.com/owner/repo.git\` work too
+
+### Navigation & History
+- **Recent section** — sidebar remembers your last 15 opened folders, GitHub repos, and URLs
+- **One-click reopen** — click any GitHub or URL history entry to reload it instantly
+- **Per-entry dismiss** — hover an entry and hit × to remove it from history
+- **Clear all** — wipe the entire history with one click
+
+### Interface
 - **Dark & light mode** — toggle in the top right, preference saved across sessions
 - **Search** — filter your local notes by title or content instantly
 - **Context Menu** — select any text to see a floating toolbar with highlighting and formatting options
-- **Works offline** — no internet required after the page loads
+- **Works offline** — no internet required after the page loads (except URL/GitHub features)
+
+---
+
+## From URL — How It Works
+
+Click **From URL** in the sidebar footer and paste:
+
+| Input | Result |
+|---|---|
+| \`github.com/owner/repo\` | Loads all \`.md\` files with full folder tree |
+| \`github.com/owner/repo.git\` | Same — \`.git\` suffix is handled automatically |
+| \`github.com/owner/repo/tree/branch\` | Loads a specific branch |
+| Any raw \`.md\` URL | Opens that single file directly |
+
+Content loaded from URLs is **read-only** — the toolbar and editing are disabled to prevent accidental changes.
 
 ---
 
@@ -48,12 +77,13 @@ Try it now: **Select any word or sentence in this paragraph.** A floating "Bubbl
 
 | Action | How |
 |---|---|
-| Switch to Preview | Click the **Eye icon** in the header |
-| Switch to Edit | Click the **Pen icon** in the header |
+| Switch to Preview | Click the **Visual** button in the header |
+| Switch to Edit | Click the **Editor** button in the header |
 | Open Context Menu | **Select text** with your mouse |
 | Save to disk | Automatic — just type and pause |
 | New note | **New Document** button in the sidebar |
-| Close folder | **Close Folder** button in the sidebar |
+| Load from URL | **From URL** button in the sidebar |
+| Close folder / URL | **Close Folder** or **Close URL** in the sidebar |
 
 ---
 

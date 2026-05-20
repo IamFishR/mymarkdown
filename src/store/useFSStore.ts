@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { get as idbGet, set as idbSet, del as idbDel } from 'idb-keyval';
 import { FolderNode, SaveStatus } from '../types';
 import { buildFolderTree, readFile, writeFile, requestPermission, toggleNodeOpen, getDirectoryHandleAtPath, preserveOpenState, setDirectoryOpen } from '../lib/fs';
+import { useHistoryStore } from './useHistoryStore';
 
 const IDB_KEY = 'markflow_folder_handle';
 
@@ -58,6 +59,7 @@ export const useFSStore = create<FSState>()((set, get) => ({
       activeFileContent: '',
       saveStatus: 'idle',
     });
+    useHistoryStore.getState().addEntry({ type: 'folder', label: handle.name });
   },
 
   closeFolder: async () => {

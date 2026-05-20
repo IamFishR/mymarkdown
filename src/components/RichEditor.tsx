@@ -13,6 +13,7 @@ import { cn } from '../lib/utils';
 interface RichEditorProps {
   initialContent: string;
   onChange: (content: string) => void;
+  readOnly?: boolean;
 }
 
 const ToolbarBtn = ({ 
@@ -42,7 +43,7 @@ const ToolbarBtn = ({
 
 const Sep = () => <div className="w-px h-4 bg-gray-200 dark:bg-gray-800 mx-1 shrink-0" />;
 
-export function RichEditor({ initialContent, onChange }: RichEditorProps) {
+export function RichEditor({ initialContent, onChange, readOnly = false }: RichEditorProps) {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -55,7 +56,9 @@ export function RichEditor({ initialContent, onChange }: RichEditorProps) {
       Highlight,
     ],
     content: initialContent,
+    editable: !readOnly,
     onUpdate({ editor }) {
+      if (readOnly) return;
       const md = (editor.storage as any).markdown.getMarkdown();
       onChange(md);
     },
@@ -71,8 +74,8 @@ export function RichEditor({ initialContent, onChange }: RichEditorProps) {
 
   return (
     <div className="w-full relative flex flex-col min-h-full">
-      {/* Sticky Toolbar - Sticks below the main app header */}
-      <div className="sticky top-0 z-20 w-full pt-1 pb-4 pointer-events-none">
+      {/* Sticky Toolbar - hidden in read-only mode */}
+      <div className={cn("sticky top-0 z-20 w-full pt-1 pb-4 pointer-events-none", readOnly && "hidden")}>
         <div className="max-w-4xl mx-auto px-4 sm:px-0">
           <div className="bg-white/40 dark:bg-[#0a0a0a]/40 backdrop-blur-3xl rounded-2xl shadow-xl border border-white/20 dark:border-white/10 flex items-center gap-1 px-3 py-2 pointer-events-auto overflow-x-auto no-scrollbar whitespace-nowrap">
             <div className="flex items-center gap-0.5">
@@ -122,8 +125,8 @@ export function RichEditor({ initialContent, onChange }: RichEditorProps) {
         <EditorContent editor={editor} className="w-full h-full" />
       </div>
 
-      {/* Bubble Menu - Ultra Glassmorphism */}
-      <BubbleMenu editor={editor} tippyOptions={{ duration: 150, animation: 'scale' }}>
+      {/* Bubble Menu - hidden in read-only mode */}
+      {!readOnly && <BubbleMenu editor={editor} tippyOptions={{ duration: 150, animation: 'scale' }}>
         <div className="flex items-center gap-1 p-1.5 bg-white/20 dark:bg-[#0a0a0a]/40 backdrop-blur-3xl rounded-2xl shadow-[0_20px_50px_rgba(249,115,22,0.3)] border border-white/30 dark:border-white/10 animate-in fade-in zoom-in duration-200">
           <ToolbarBtn title="Bold" active={editor.isActive('bold')} onClick={() => editor.chain().focus().toggleBold().run()}>
             <Bold size={14} />
@@ -145,7 +148,7 @@ export function RichEditor({ initialContent, onChange }: RichEditorProps) {
             <Strikethrough size={14} />
           </ToolbarBtn>
         </div>
-      </BubbleMenu>
+      </BubbleMenu>}
     </div>
   );
 }

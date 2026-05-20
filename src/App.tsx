@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { 
-  Menu, FileText, Type, Clock, Sun, Moon, 
-  Pen, BookOpen 
+import {
+  Menu, FileText, Type, Clock, Sun, Moon,
+  Pen, BookOpen, Loader2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAppStore } from './store/useAppStore';
 import { useFSStore } from './store/useFSStore';
+import { useGitHubStore } from './store/useGitHubStore';
 import { RichEditor } from './components/RichEditor';
 import { Sidebar } from './components/Sidebar';
 import { cn } from './lib/utils';
@@ -27,6 +28,11 @@ export default function App() {
   const saveStatus = useFSStore((s) => s.saveStatus);
   const updateFileContent = useFSStore((s) => s.updateFileContent);
   const restoreFromIndexedDB = useFSStore((s) => s.restoreFromIndexedDB);
+
+  const ghLoadStatus = useGitHubStore((s) => s.loadStatus);
+  const ghActiveFilePath = useGitHubStore((s) => s.activeFilePath);
+  const ghActiveFileContent = useGitHubStore((s) => s.activeFileContent);
+  const ghFileLoadStatus = useGitHubStore((s) => s.fileLoadStatus);
 
   const [isMobile, setIsMobile] = useState(false);
 
@@ -50,18 +56,25 @@ export default function App() {
   }, [theme]);
 
   const isInFolderMode = folderHandle !== null;
+  const isInGitHubMode = ghLoadStatus === 'loaded';
   const activeNote = useMemo(() => notes.find((n) => n.id === activeNoteId), [notes, activeNoteId]);
-  
-  const editorTitle = isInFolderMode 
+
+  const editorTitle = isInFolderMode
     ? (activeFilePath?.split('/').pop()?.replace(/\.md$/, '') || '')
+    : isInGitHubMode
+    ? (ghActiveFilePath?.split('/').pop()?.replace(/\.md$/, '') || '')
     : (activeNote?.title || '');
 
-  const editorContent = isInFolderMode ? (activeFileContent || '') : (activeNote?.content || '');
+  const editorContent = isInFolderMode
+    ? (activeFileContent || '')
+    : isInGitHubMode
+    ? (ghActiveFileContent || '')
+    : (activeNote?.content || '');
 
   const handleEditorChange = (content: string) => {
     if (isInFolderMode) {
       updateFileContent(content);
-    } else {
+    } else if (!isInGitHubMode) {
       updateNote(content);
     }
   };
@@ -145,10 +158,15 @@ export default function App() {
           isMobile ? "pt-16" : "pt-20"
         )}>
           <div className="w-full max-w-4xl mx-auto min-h-full flex flex-col">
-            {isInFolderMode && !activeFilePath ? (
+            {(isInFolderMode && !activeFilePath) || (isInGitHubMode && !ghActiveFilePath) ? (
               <div className="flex-1 flex flex-col items-center justify-center py-20 text-gray-400 gap-3">
                 <FileText size={48} className="opacity-20" />
                 <p className="text-sm font-mono tracking-widest">Select a file to begin</p>
+              </div>
+            ) : isInGitHubMode && ghFileLoadStatus === 'loading' ? (
+              <div className="flex-1 flex flex-col items-center justify-center py-20 text-gray-400 gap-3">
+                <Loader2 size={32} className="animate-spin text-orange-500" />
+                <p className="text-sm font-mono tracking-widest">Loading file...</p>
               </div>
             ) : (
               <AnimatePresence mode="wait">
@@ -161,12 +179,16 @@ export default function App() {
                     className="w-full px-4 sm:px-8 md:px-10 flex-1 flex flex-col"
                   >
                     <textarea
-                      autoFocus
+                      autoFocus={!isInGitHubMode}
                       spellCheck="false"
+                      readOnly={isInGitHubMode}
                       value={editorContent}
                       onChange={(e) => handleEditorChange(e.target.value)}
                       placeholder="Start writing..."
-                      className="w-full flex-1 bg-transparent outline-none resize-none font-mono text-base sm:text-lg leading-relaxed min-h-[60vh] py-10"
+                      className={cn(
+                        "w-full flex-1 bg-transparent outline-none resize-none font-mono text-base sm:text-lg leading-relaxed min-h-[60vh] py-10",
+                        isInGitHubMode && "cursor-default select-text"
+                      )}
                     />
                   </motion.div>
                 ) : (
@@ -177,7 +199,7 @@ export default function App() {
                     exit={{ opacity: 0, y: -10 }}
                     className="w-full flex-1"
                   >
-                    <RichEditor initialContent={editorContent} onChange={handleEditorChange} />
+                    <RichEditor initialContent={editorContent} onChange={handleEditorChange} readOnly={isInGitHubMode} />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -202,10 +224,17 @@ export default function App() {
           </div>
           <div className={cn(
             "transition-colors",
-            saveStatus === 'saving' && "text-orange-500",
-            saveStatus === 'saved' && "text-green-500"
+            !isInGitHubMode && saveStatus === 'saving' && "text-orange-500",
+            !isInGitHubMode && saveStatus === 'saved' && "text-green-500",
+            isInGitHubMode && "text-blue-400"
           )}>
-            {saveStatus === 'saving' ? 'Saving...' : saveStatus === 'saved' ? 'Saved' : 'MarkFlow Engine'}
+            {isInGitHubMode
+              ? 'Read-only'
+              : saveStatus === 'saving'
+              ? 'Saving...'
+              : saveStatus === 'saved'
+              ? 'Saved'
+              : 'MarkFlow Engine'}
           </div>
         </motion.footer>
       </motion.main>
