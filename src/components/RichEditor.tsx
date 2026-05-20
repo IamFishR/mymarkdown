@@ -1,29 +1,28 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import { BubbleMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
 import { Markdown } from 'tiptap-markdown';
 import Highlight from '@tiptap/extension-highlight';
-import { 
-  Bold, Italic, Strikethrough, Code, Quote, 
-  List, ListOrdered, Heading1, Heading2, Heading3 
-} from 'lucide-react';
+import { Bold, Italic, Strikethrough, Code } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { EditorToolbar } from './EditorToolbar';
 
 interface RichEditorProps {
   initialContent: string;
   onChange: (content: string) => void;
   readOnly?: boolean;
+  onEditorReady?: (editor: unknown) => void;
 }
 
-const ToolbarBtn = ({ 
-  onClick, 
-  active, 
-  children, 
-  title 
-}: { 
-  onClick: () => void; 
-  active?: boolean; 
+const BubbleBtn = ({
+  onClick,
+  active,
+  children,
+  title,
+}: {
+  onClick: () => void;
+  active?: boolean;
   children: React.ReactNode;
   title: string;
 }) => (
@@ -32,8 +31,8 @@ const ToolbarBtn = ({
     title={title}
     className={cn(
       'p-2 rounded-xl transition-all duration-300 shrink-0',
-      active 
-        ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.5)] scale-105 backdrop-blur-sm' 
+      active
+        ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.5)] scale-105'
         : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white'
     )}
   >
@@ -43,7 +42,9 @@ const ToolbarBtn = ({
 
 const Sep = () => <div className="w-px h-4 bg-gray-200 dark:bg-gray-800 mx-1 shrink-0" />;
 
-export function RichEditor({ initialContent, onChange, readOnly = false }: RichEditorProps) {
+export function RichEditor({ initialContent, onChange, readOnly = false, onEditorReady }: RichEditorProps) {
+  const onEditorReadyRef = useRef(onEditorReady);
+  onEditorReadyRef.current = onEditorReady;
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -70,52 +71,20 @@ export function RichEditor({ initialContent, onChange, readOnly = false }: RichE
     },
   });
 
+  useEffect(() => {
+    onEditorReadyRef.current?.(editor);
+    return () => { onEditorReadyRef.current?.(null); };
+  }, [editor]);
+
   if (!editor) return null;
 
   return (
     <div className="w-full relative flex flex-col min-h-full">
-      {/* Sticky Toolbar - hidden in read-only mode */}
-      <div className={cn("sticky top-0 z-20 w-full pt-1 pb-4 pointer-events-none", readOnly && "hidden")}>
+      {/* Sticky Toolbar - mobile only, hidden in read-only mode */}
+      <div className={cn("md:hidden sticky top-0 z-20 w-full pt-1 pb-4 pointer-events-none", readOnly && "hidden")}>
         <div className="max-w-4xl mx-auto px-4 sm:px-0">
           <div className="bg-white/40 dark:bg-[#0a0a0a]/40 backdrop-blur-3xl rounded-2xl shadow-xl border border-white/20 dark:border-white/10 flex items-center gap-1 px-3 py-2 pointer-events-auto overflow-x-auto no-scrollbar whitespace-nowrap">
-            <div className="flex items-center gap-0.5">
-              <ToolbarBtn title="H1" active={editor.isActive('heading', { level: 1 })} onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}>
-                <Heading1 size={16} />
-              </ToolbarBtn>
-              <ToolbarBtn title="H2" active={editor.isActive('heading', { level: 2 })} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
-                <Heading2 size={16} />
-              </ToolbarBtn>
-              <ToolbarBtn title="H3" active={editor.isActive('heading', { level: 3 })} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
-                <Heading3 size={16} />
-              </ToolbarBtn>
-
-              <Sep />
-
-              <ToolbarBtn title="Bold (⌘B)" active={editor.isActive('bold')} onClick={() => editor.chain().focus().toggleBold().run()}>
-                <Bold size={16} />
-              </ToolbarBtn>
-              <ToolbarBtn title="Italic (⌘I)" active={editor.isActive('italic')} onClick={() => editor.chain().focus().toggleItalic().run()}>
-                <Italic size={16} />
-              </ToolbarBtn>
-              <ToolbarBtn title="Strikethrough" active={editor.isActive('strike')} onClick={() => editor.chain().focus().toggleStrike().run()}>
-                <Strikethrough size={16} />
-              </ToolbarBtn>
-              <ToolbarBtn title="Inline code" active={editor.isActive('code')} onClick={() => editor.chain().focus().toggleCode().run()}>
-                <Code size={16} />
-              </ToolbarBtn>
-
-              <Sep />
-
-              <ToolbarBtn title="Bullet list" active={editor.isActive('bulletList')} onClick={() => editor.chain().focus().toggleBulletList().run()}>
-                <List size={16} />
-              </ToolbarBtn>
-              <ToolbarBtn title="Numbered list" active={editor.isActive('orderedList')} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
-                <ListOrdered size={16} />
-              </ToolbarBtn>
-              <ToolbarBtn title="Blockquote" active={editor.isActive('blockquote')} onClick={() => editor.chain().focus().toggleBlockquote().run()}>
-                <Quote size={16} />
-              </ToolbarBtn>
-            </div>
+            <EditorToolbar editor={editor} />
           </div>
         </div>
       </div>
@@ -128,25 +97,25 @@ export function RichEditor({ initialContent, onChange, readOnly = false }: RichE
       {/* Bubble Menu - hidden in read-only mode */}
       {!readOnly && <BubbleMenu editor={editor} tippyOptions={{ duration: 150, animation: 'scale' }}>
         <div className="flex items-center gap-1 p-1.5 bg-white/20 dark:bg-[#0a0a0a]/40 backdrop-blur-3xl rounded-2xl shadow-[0_20px_50px_rgba(249,115,22,0.3)] border border-white/30 dark:border-white/10 animate-in fade-in zoom-in duration-200">
-          <ToolbarBtn title="Bold" active={editor.isActive('bold')} onClick={() => editor.chain().focus().toggleBold().run()}>
+          <BubbleBtn title="Bold" active={editor.isActive('bold')} onClick={() => editor.chain().focus().toggleBold().run()}>
             <Bold size={14} />
-          </ToolbarBtn>
-          <ToolbarBtn title="Italic" active={editor.isActive('italic')} onClick={() => editor.chain().focus().toggleItalic().run()}>
+          </BubbleBtn>
+          <BubbleBtn title="Italic" active={editor.isActive('italic')} onClick={() => editor.chain().focus().toggleItalic().run()}>
             <Italic size={14} />
-          </ToolbarBtn>
-          <ToolbarBtn title="Highlight" active={editor.isActive('highlight')} onClick={() => editor.chain().focus().toggleHighlight().run()}>
+          </BubbleBtn>
+          <BubbleBtn title="Highlight" active={editor.isActive('highlight')} onClick={() => (editor as any).chain().focus().toggleHighlight().run()}>
             <div className={cn(
               "w-4 h-4 rounded-full border-2",
               editor.isActive('highlight') ? "bg-white border-white" : "bg-orange-500 border-orange-500/20"
             )} />
-          </ToolbarBtn>
+          </BubbleBtn>
           <Sep />
-          <ToolbarBtn title="Inline code" active={editor.isActive('code')} onClick={() => editor.chain().focus().toggleCode().run()}>
+          <BubbleBtn title="Inline code" active={editor.isActive('code')} onClick={() => editor.chain().focus().toggleCode().run()}>
             <Code size={14} />
-          </ToolbarBtn>
-          <ToolbarBtn title="Strikethrough" active={editor.isActive('strike')} onClick={() => editor.chain().focus().toggleStrike().run()}>
+          </BubbleBtn>
+          <BubbleBtn title="Strikethrough" active={editor.isActive('strike')} onClick={() => editor.chain().focus().toggleStrike().run()}>
             <Strikethrough size={14} />
-          </ToolbarBtn>
+          </BubbleBtn>
         </div>
       </BubbleMenu>}
     </div>

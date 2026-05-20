@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Menu, FileText, Type, Clock, Sun, Moon,
   Pen, BookOpen, Loader2
@@ -8,6 +8,7 @@ import { useAppStore } from './store/useAppStore';
 import { useFSStore } from './store/useFSStore';
 import { useGitHubStore } from './store/useGitHubStore';
 import { RichEditor } from './components/RichEditor';
+import { EditorToolbar } from './components/EditorToolbar';
 import { Sidebar } from './components/Sidebar';
 import { cn } from './lib/utils';
 
@@ -35,6 +36,11 @@ export default function App() {
   const ghFileLoadStatus = useGitHubStore((s) => s.fileLoadStatus);
 
   const [isMobile, setIsMobile] = useState(false);
+  const [activeEditor, setActiveEditor] = useState<unknown>(null);
+
+  const handleEditorReady = useCallback((editor: unknown) => {
+    setActiveEditor(editor);
+  }, []);
 
   useEffect(() => {
     restoreFromIndexedDB();
@@ -114,30 +120,39 @@ export default function App() {
         {/* Fixed Header */}
         <motion.header
           initial={false}
-          animate={{ 
+          animate={{
             left: !isMobile && isSidebarOpen ? 312 + 16 : (isMobile ? 0 : 16),
             right: isMobile ? 0 : 16,
             top: isMobile ? 0 : 16,
             borderRadius: isMobile ? 0 : 16,
           }}
           className={cn(
-            "fixed flex items-center justify-between bg-white/60 dark:bg-[#0a0a0a]/80 backdrop-blur-xl z-30 border shadow-lg transition-all duration-300",
+            "fixed flex items-center bg-white/60 dark:bg-[#0a0a0a]/80 backdrop-blur-xl z-30 border shadow-lg transition-all duration-300",
             isMobile ? "h-16 px-4 border-gray-200 dark:border-white/10" : "h-14 px-6 border-white/10 shadow-xl"
           )}
         >
-          <div className="flex items-center gap-3 overflow-hidden">
+          {/* Left: menu + title */}
+          <div className="flex items-center gap-3 min-w-0 flex-1">
             {!isSidebarOpen && (
               <button onClick={() => setSidebarOpen(true)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl text-orange-500 shrink-0">
                 <Menu size={18} />
               </button>
             )}
-            <div className="flex items-center gap-2 text-sm font-medium truncate italic text-gray-500">
+            <div className="flex items-center gap-2 text-sm font-medium truncate italic text-gray-500 min-w-0">
               <FileText size={16} className="shrink-0" />
               <span className="text-gray-900 dark:text-gray-100 font-bold truncate not-italic">{editorTitle || 'MarkFlow'}</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* Center: toolbar — desktop only, visual mode only, not read-only */}
+          {isPreviewMode && !isInGitHubMode && (
+            <div className="hidden md:flex items-center justify-center flex-1 overflow-x-auto no-scrollbar">
+              <EditorToolbar editor={activeEditor as Parameters<typeof EditorToolbar>[0]['editor']} />
+            </div>
+          )}
+
+          {/* Right: editor/visual toggle + theme */}
+          <div className="flex items-center gap-2 flex-1 justify-end">
             <div className="flex bg-gray-100 dark:bg-gray-900 p-1 rounded-xl border border-gray-200 dark:border-white/5">
               <button onClick={() => setPreviewMode(false)} className={cn("p-1.5 px-3 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-2", !isPreviewMode ? "bg-white dark:bg-orange-500 text-orange-600 dark:text-white shadow-sm" : "text-gray-400")}>
                 <Pen size={12} /> <span className="hidden sm:inline">Editor</span>
@@ -199,7 +214,7 @@ export default function App() {
                     exit={{ opacity: 0, y: -10 }}
                     className="w-full flex-1"
                   >
-                    <RichEditor initialContent={editorContent} onChange={handleEditorChange} readOnly={isInGitHubMode} />
+                    <RichEditor initialContent={editorContent} onChange={handleEditorChange} readOnly={isInGitHubMode} onEditorReady={handleEditorReady} />
                   </motion.div>
                 )}
               </AnimatePresence>
