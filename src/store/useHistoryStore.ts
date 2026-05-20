@@ -39,6 +39,6 @@ export const useHistoryStore = create<HistoryState>()(
 
       clearHistory: () => set({ entries: [] }),
     }),
-    { name: 'markflow_history' }
+    { name: 'markflow_history', version: 1 }
   )
 );

@@ -202,7 +202,7 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'markflow_app',
-      version: 3,
+      version: 4,
       partialize: (s) => ({
         theme: s.theme,
         isSidebarOpen: s.isSidebarOpen,
