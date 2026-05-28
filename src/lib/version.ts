@@ -1,6 +1,6 @@
 // Bump this manually before each deploy that has breaking state changes.
 // Mismatch between this and the stored value clears all state and reloads.
-export const APP_VERSION = '1.1.0';
+export const APP_VERSION = '1.1.1';
 
 const VERSION_KEY = 'markflow_version';
 
