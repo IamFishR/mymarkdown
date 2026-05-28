@@ -203,7 +203,9 @@ export const useAppStore = create<AppState>()(
     {
       name: 'markflow_app',
       version: 4,
-      migrate: () => ({}),
+      // Bump `version` and transform `persistedState` here when the store shape changes.
+      // Never return `{}` — that wipes user data. Default to passthrough.
+      migrate: (persistedState) => persistedState as AppState,
       partialize: (s) => ({
         theme: s.theme,
         isSidebarOpen: s.isSidebarOpen,
