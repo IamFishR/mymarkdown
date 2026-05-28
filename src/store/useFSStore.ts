@@ -27,6 +27,7 @@ interface FSState {
 }
 
 let saveIdleTimer: ReturnType<typeof setTimeout> | undefined;
+let saveDebounceTimer: ReturnType<typeof setTimeout> | undefined;
 
 export const useFSStore = create<FSState>()((set, get) => ({
   folderHandle: null,
@@ -87,6 +88,10 @@ export const useFSStore = create<FSState>()((set, get) => ({
 
   updateFileContent: (content) => {
     set({ activeFileContent: content, saveStatus: 'saving' });
+    clearTimeout(saveDebounceTimer);
+    saveDebounceTimer = setTimeout(() => {
+      get().saveActiveFile();
+    }, 500);
   },
 
   saveActiveFile: async () => {
@@ -130,10 +135,10 @@ export const useFSStore = create<FSState>()((set, get) => ({
   },
 
   refreshTree: async () => {
-    const { folderHandle } = get();
+    const { folderHandle, tree: currentTree } = get();
     if (!folderHandle) return;
-    const tree = await buildFolderTree(folderHandle);
-    set({ tree });
+    const newTree = await buildFolderTree(folderHandle);
+    set({ tree: preserveOpenState(newTree, currentTree) });
   },
 
   createFileInDirectory: async (dirPath, fileName) => {
