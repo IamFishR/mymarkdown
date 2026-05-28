@@ -7,7 +7,7 @@
           {
             "type": "command",
             "if": "Bash(git commit *)",
-            "command": "bash .claude/bump-version.sh",
+            "command": "node .claude/bump-version.mjs",
             "timeout": 10,
             "statusMessage": "Bumping APP_VERSION..."
           }
@@ -19,7 +19,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sed -i \"s/Last updated: .*/Last updated: $(date '+%Y-%m-%d')/\" /home/rakesh/Dev/myprojects/mymarkdown/.claude/PROGRESS.md"
+            "command": "node .claude/update-progress-date.mjs"
           }
         ]
       }
@@ -30,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '=== Where you left off ===' && grep -A2 '## Current Focus' /home/rakesh/Dev/myprojects/mymarkdown/.claude/PROGRESS.md && echo '' && grep -A4 '## Resume Here' /home/rakesh/Dev/myprojects/mymarkdown/.claude/PROGRESS.md"
+            "command": "node .claude/show-resume.mjs"
           }
         ]
       }
