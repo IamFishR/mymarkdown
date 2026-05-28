@@ -13,6 +13,27 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sed -i \"s/Last updated: .*/Last updated: $(date '+%Y-%m-%d')/\" /home/rakesh/Dev/myprojects/mymarkdown/.claude/PROGRESS.md"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '=== Where you left off ===' && grep -A2 '## Current Focus' /home/rakesh/Dev/myprojects/mymarkdown/.claude/PROGRESS.md && echo '' && grep -A4 '## Resume Here' /home/rakesh/Dev/myprojects/mymarkdown/.claude/PROGRESS.md"
+          }
+        ]
+      }
     ]
   }
 }

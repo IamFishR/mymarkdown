@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Session Start
+1. Read `.claude/PROGRESS.md` — confirm current focus before any work
+2. Read `GOAL.md` if context on product direction or feature prioritization is needed
+
 ## Commands
 
 ```bash
